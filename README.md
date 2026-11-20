@@ -1,6 +1,6 @@
 # MeetMaster
 
-AI-powered meeting intelligence for a B.Tech CSE Mobile Computing project. JavaScript Expo app, built to run on an Android phone through **Expo Go** (no Android Studio).
+AI-powered meeting script intelligence app with the help of JavaScript Expo. Built to run on an Android phone through **Expo Go** (no Android Studio required).
 
 ## PowerShell setup
 
