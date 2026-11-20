@@ -25,7 +25,11 @@ export function MeetingsProvider({ children }) {
       setMeetings(storedMeetings);
       setDemoMode(storedDemoMode);
       setReady(true);
-      configureNotifications();
+      try {
+        await configureNotifications();
+      } catch (err) {
+        console.warn('Notification setup skipped:', err?.message || err);
+      }
     })();
     return () => {
       mounted = false;
@@ -66,10 +70,16 @@ export function MeetingsProvider({ children }) {
   }, [demoMode]);
 
   const addMeeting = useCallback(async (meeting) => {
-    const withReminders = await scheduleActionReminders(meeting);
-    const next = await upsertMeeting(withReminders);
+    let meetingToSave = meeting;
+    try {
+      meetingToSave = await scheduleActionReminders(meeting);
+    } catch (err) {
+      console.warn('Reminder scheduling skipped, saving meeting anyway:', err?.message || err);
+      meetingToSave = meeting;
+    }
+    const next = await upsertMeeting(meetingToSave);
     setMeetings(next);
-    return withReminders;
+    return meetingToSave;
   }, []);
 
   const toggleTask = useCallback(async (meetingId, actionItemId) => {
@@ -77,8 +87,12 @@ export function MeetingsProvider({ children }) {
     const task = meeting?.action_items?.find((item) => item.id === actionItemId);
     if (!task) return;
     const completed = !task.completed;
-    if (completed) {
-      await cancelActionReminder(task.notificationId);
+    if (completed && task.notificationId) {
+      try {
+        await cancelActionReminder(task.notificationId);
+      } catch (err) {
+        console.warn('Cancel reminder skipped:', err?.message || err);
+      }
     }
     const next = await updateActionItem(meetingId, actionItemId, {
       completed,
