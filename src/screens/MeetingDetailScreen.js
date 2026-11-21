@@ -16,11 +16,12 @@ import { useMeetings } from '../context/MeetingsContext';
 import { askMeetingQuestion } from '../services/geminiMeetingService';
 import { exportMeetingPdf } from '../services/pdfService';
 import { colors, radius, spacing } from '../theme';
+import { confirmMeetingDeletion, showMeetingDeletionError } from '../utils/confirmMeetingDeletion';
 import { formatDate, formatElapsed } from '../utils/format';
 
 export default function MeetingDetailScreen({ navigation, route }) {
   const { meetingId } = route.params;
-  const { getMeeting, toggleTask } = useMeetings();
+  const { getMeeting, toggleTask, deleteMeeting } = useMeetings();
   const meeting = getMeeting(meetingId);
 
   const player = useAudioPlayer(meeting?.audioUri ? { uri: meeting.audioUri } : null);
@@ -30,6 +31,7 @@ export default function MeetingDetailScreen({ navigation, route }) {
   const [answer, setAnswer] = useState('');
   const [asking, setAsking] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: meeting?.title || 'Meeting' });
@@ -61,10 +63,20 @@ export default function MeetingDetailScreen({ navigation, route }) {
     player.pause();
   };
 
-  const replayAudio = async () => {
-    if (!meeting.audioUri) return;
-    await player.seekTo(0);
-    player.play();
+  const requestMeetingDeletion = () => {
+    confirmMeetingDeletion(meeting, async () => {
+      setDeleting(true);
+      try {
+        player.pause();
+        player.replace(null);
+        await deleteMeeting(meeting.id);
+        navigation.goBack();
+      } catch (error) {
+        showMeetingDeletionError(error);
+      } finally {
+        setDeleting(false);
+      }
+    });
   };
 
   const askQuestion = async () => {
@@ -105,11 +117,11 @@ export default function MeetingDetailScreen({ navigation, route }) {
           {meeting.audioUri ? `${currentLabel} / ${durationLabel}` : 'Transcript-only demo meeting'}
         </Text>
         <View style={styles.playRow}>
-          <Pressable style={styles.playBtn} onPress={status.playing ? pauseAudio : playAudio}>
+          <Pressable style={styles.playBtn} onPress={status.playing ? pauseAudio : playAudio} disabled={deleting}>
             <Text style={styles.playText}>{status.playing ? 'Pause' : 'Play'}</Text>
           </Pressable>
-          <Pressable style={styles.ghostBtn} onPress={replayAudio}>
-            <Text style={styles.ghostText}>Replay</Text>
+          <Pressable style={styles.deleteBtn} onPress={requestMeetingDeletion} disabled={deleting}>
+            {deleting ? <ActivityIndicator color={colors.danger} /> : <Text style={styles.deleteText}>Delete</Text>}
           </Pressable>
         </View>
       </View>
@@ -247,16 +259,17 @@ const styles = StyleSheet.create({
     color: colors.bg,
     fontWeight: '800',
   },
-  ghostBtn: {
+  deleteBtn: {
+    backgroundColor: colors.dangerSoft,
     borderRadius: radius.md,
     paddingVertical: 12,
     alignItems: 'center',
     flex: 1,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.danger,
   },
-  ghostText: {
-    color: colors.text,
+  deleteText: {
+    color: colors.danger,
     fontWeight: '800',
   },
   hint: {

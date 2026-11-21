@@ -1,7 +1,10 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { File } from 'expo-file-system';
+import { Platform } from 'react-native';
 import {
   loadDemoMode,
   loadMeetings,
+  removeMeeting as removeStoredMeeting,
   saveDemoMode,
   saveMeetings,
   updateActionItem,
@@ -101,6 +104,31 @@ export function MeetingsProvider({ children }) {
     setMeetings(next);
   }, [meetings]);
 
+  const deleteMeeting = useCallback(async (meetingId) => {
+    const meeting = meetings.find((item) => item.id === meetingId);
+    if (!meeting) return;
+
+    for (const item of meeting.action_items || []) {
+      if (item.notificationId) {
+        await cancelActionReminder(item.notificationId);
+      }
+    }
+
+    if (meeting.audioUri) {
+      if (Platform.OS === 'web') {
+        if (meeting.audioUri.startsWith('blob:')) {
+          URL.revokeObjectURL(meeting.audioUri);
+        }
+      } else if (meeting.audioUri.startsWith('file://')) {
+        const audioFile = new File(meeting.audioUri);
+        if (audioFile.exists) audioFile.delete();
+      }
+    }
+
+    const next = await removeStoredMeeting(meetingId);
+    setMeetings(next);
+  }, [meetings]);
+
   const getMeeting = useCallback(
     (meetingId) => meetings.find((meeting) => meeting.id === meetingId),
     [meetings]
@@ -120,6 +148,7 @@ export function MeetingsProvider({ children }) {
     toggleDemoMode,
     addMeeting,
     toggleTask,
+    deleteMeeting,
     getMeeting,
     replaceMeetings,
   };

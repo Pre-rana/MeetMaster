@@ -1,14 +1,16 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TaskRow } from '../components/TaskRow';
 import { useMeetings } from '../context/MeetingsContext';
 import { colors, radius, spacing } from '../theme';
+import { confirmMeetingDeletion, showMeetingDeletionError } from '../utils/confirmMeetingDeletion';
 import { formatDate } from '../utils/format';
 
 export default function DashboardScreen({ navigation }) {
-  const { demoMode, toggleDemoMode, meetings, allTasks, stats, toggleTask, ready } = useMeetings();
+  const { demoMode, toggleDemoMode, meetings, allTasks, stats, toggleTask, deleteMeeting, ready } = useMeetings();
   const [taskFilter, setTaskFilter] = useState('pending');
+  const [deletingMeetingId, setDeletingMeetingId] = useState(null);
 
   const filteredTasks = useMemo(() => {
     return allTasks.filter((item) => (taskFilter === 'completed' ? item.completed : !item.completed));
@@ -16,6 +18,19 @@ export default function DashboardScreen({ navigation }) {
 
   const openMeeting = (meetingId) => {
     navigation.navigate('MeetingDetail', { meetingId });
+  };
+
+  const requestMeetingDeletion = (meeting) => {
+    confirmMeetingDeletion(meeting, async () => {
+      setDeletingMeetingId(meeting.id);
+      try {
+        await deleteMeeting(meeting.id);
+      } catch (error) {
+        showMeetingDeletionError(error);
+      } finally {
+        setDeletingMeetingId(null);
+      }
+    });
   };
 
   return (
@@ -54,20 +69,40 @@ export default function DashboardScreen({ navigation }) {
 
         <Text style={styles.section}>Recent meetings</Text>
         {meetings.slice(0, 6).map((meeting) => (
-          <Pressable key={meeting.id} style={styles.meetingCard} onPress={() => openMeeting(meeting.id)}>
+          <View key={meeting.id} style={styles.meetingCard}>
             <View style={styles.meetingTop}>
-              <Text style={styles.meetingTitle}>{meeting.title}</Text>
-              {meeting.isDemo ? (
-                <View style={styles.demoTag}>
-                  <Text style={styles.demoTagText}>DEMO</Text>
-                </View>
-              ) : null}
+              <Pressable style={styles.meetingHeading} onPress={() => openMeeting(meeting.id)}>
+                <Text style={styles.meetingTitle}>{meeting.title}</Text>
+              </Pressable>
+              <View style={styles.meetingActions}>
+                {meeting.isDemo ? (
+                  <View style={styles.demoTag}>
+                    <Text style={styles.demoTagText}>DEMO</Text>
+                  </View>
+                ) : null}
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Delete ${meeting.title}`}
+                  disabled={deletingMeetingId !== null}
+                  hitSlop={8}
+                  onPress={() => requestMeetingDeletion(meeting)}
+                  style={styles.deleteMeetingButton}
+                >
+                  {deletingMeetingId === meeting.id ? (
+                    <ActivityIndicator size="small" color={colors.danger} />
+                  ) : (
+                    <Text style={styles.deleteMeetingIcon}>×</Text>
+                  )}
+                </Pressable>
+              </View>
             </View>
-            <Text style={styles.meetingMeta}>{formatDate(meeting.date)}</Text>
-            <Text style={styles.meetingSummary} numberOfLines={2}>
-              {meeting.summary}
-            </Text>
-          </Pressable>
+            <Pressable style={styles.meetingBody} onPress={() => openMeeting(meeting.id)}>
+              <Text style={styles.meetingMeta}>{formatDate(meeting.date)}</Text>
+              <Text style={styles.meetingSummary} numberOfLines={2}>
+                {meeting.summary}
+              </Text>
+            </Pressable>
+          </View>
         ))}
 
         <View style={styles.sectionRow}>
@@ -246,8 +281,30 @@ const styles = StyleSheet.create({
   },
   meetingTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: 8,
+  },
+  meetingHeading: {
+    flex: 1,
+  },
+  meetingActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  deleteMeetingButton: {
+    width: 30,
+    height: 30,
+    borderRadius: radius.pill,
+    backgroundColor: colors.dangerSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteMeetingIcon: {
+    color: colors.danger,
+    fontSize: 21,
+    lineHeight: 24,
+    fontWeight: '700',
   },
   meetingTitle: {
     color: colors.text,
@@ -276,6 +333,9 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginTop: 8,
     lineHeight: 20,
+  },
+  meetingBody: {
+    marginTop: 4,
   },
   empty: {
     color: colors.muted,
