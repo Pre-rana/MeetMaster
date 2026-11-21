@@ -140,7 +140,7 @@ export default function RecordScreen({ navigation }) {
 
       <View style={styles.controls}>
         {phase === 'idle' && !isBusy ? (
-          <Pressable style={styles.primary} onPress={startRecording}>
+          <Pressable style={[styles.primary, styles.recordButton]} onPress={startRecording}>
             <Text style={styles.primaryText}>Start recording</Text>
           </Pressable>
         ) : null}
@@ -242,10 +242,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
+  recordButton: {
+    flex: 0,
+    minHeight: 56,
+    justifyContent: 'center',
+  },
   primaryText: {
-    color: colors.bg,
+    color: colors.surface,
     fontWeight: '800',
     fontSize: 16,
+    textAlign: 'center',
+    flexShrink: 0,
   },
   secondary: {
     backgroundColor: colors.card,
