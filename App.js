@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { MeetingsProvider } from './src/context/MeetingsContext';
@@ -12,9 +12,9 @@ import { colors } from './src/theme';
 const Stack = createNativeStackNavigator();
 
 const navTheme = {
-  ...DarkTheme,
+  ...DefaultTheme,
   colors: {
-    ...DarkTheme.colors,
+    ...DefaultTheme.colors,
     background: colors.bg,
     card: colors.surface,
     text: colors.text,
@@ -28,7 +28,7 @@ export default function App() {
     <SafeAreaProvider>
       <MeetingsProvider>
         <NavigationContainer theme={navTheme}>
-          <StatusBar style="light" />
+          <StatusBar style="dark" />
           <Stack.Navigator
             screenOptions={{
               headerStyle: { backgroundColor: colors.surface },

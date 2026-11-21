@@ -36,12 +36,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   bubbleOne: {
-    backgroundColor: 'rgba(91, 140, 255, 0.12)',
-    borderColor: 'rgba(91, 140, 255, 0.35)',
+    backgroundColor: colors.speaker1Soft,
+    borderColor: colors.speaker1,
   },
   bubbleTwo: {
-    backgroundColor: 'rgba(192, 132, 252, 0.12)',
-    borderColor: 'rgba(192, 132, 252, 0.35)',
+    backgroundColor: colors.speaker2Soft,
+    borderColor: colors.speaker2,
   },
   header: {
     flexDirection: 'row',

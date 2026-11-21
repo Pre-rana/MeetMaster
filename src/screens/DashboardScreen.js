@@ -32,7 +32,7 @@ export default function DashboardScreen({ navigation }) {
               value={demoMode}
               onValueChange={toggleDemoMode}
               thumbColor={demoMode ? colors.teal : colors.muted}
-              trackColor={{ false: colors.border, true: 'rgba(62, 224, 194, 0.35)' }}
+              trackColor={{ false: colors.border, true: colors.accentSoft }}
             />
           </View>
         </View>
@@ -157,25 +157,25 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cta: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentSoft,
     borderRadius: radius.lg,
     padding: spacing.md,
     marginBottom: spacing.md,
   },
   ctaEyebrow: {
-    color: colors.bg,
+    color: colors.accent,
     fontWeight: '800',
     letterSpacing: 1.2,
     fontSize: 11,
   },
   ctaTitle: {
-    color: colors.bg,
+    color: colors.accent,
     fontSize: 24,
     fontWeight: '800',
     marginTop: 4,
   },
   ctaSub: {
-    color: 'rgba(11, 18, 32, 0.78)',
+    color: colors.accent,
     marginTop: 6,
     fontSize: 13,
   },

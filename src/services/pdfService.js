@@ -1,6 +1,7 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
+import { colors } from '../theme';
 import { formatDate, formatDeadline } from '../utils/format';
 
 function escapeHtml(value) {
@@ -40,14 +41,14 @@ export function buildMinutesHtml(meeting) {
     <title>${escapeHtml(meeting.title)} - MeetMaster Minutes</title>
     <style>
       @page { margin: 18mm; }
-      body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: #122033; }
+      body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: ${colors.text}; }
       h1 { margin: 0 0 6px; }
-      .brand { color: #3558d4; letter-spacing: 0.08em; font-size: 12px; font-weight: 700; text-transform: uppercase; }
-      .muted { color: #5b6b80; margin-bottom: 22px; }
-      h2 { margin-top: 26px; border-bottom: 1px solid #d9e1ee; padding-bottom: 6px; }
+      .brand { color: ${colors.accent}; letter-spacing: 0.08em; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+      .muted { color: ${colors.muted}; margin-bottom: 22px; }
+      h2 { margin-top: 26px; border-bottom: 1px solid ${colors.border}; padding-bottom: 6px; }
       table { width: 100%; border-collapse: collapse; }
-      th, td { border: 1px solid #d9e1ee; padding: 8px; text-align: left; font-size: 13px; }
-      th { background: #eef3ff; }
+      th, td { border: 1px solid ${colors.border}; padding: 8px; text-align: left; font-size: 13px; }
+      th { background: ${colors.accentSoft}; }
       tr, p { break-inside: avoid; }
     </style>
   </head>
