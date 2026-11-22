@@ -4,7 +4,7 @@
 
 ## Highlights
 
-- **From audio to action:** Convert a recording into a summary, decisions, speaker transcript, and assigned tasks.
+- **From audio to straight action:** Convert a recording into a summary, decisions, speaker transcript, and assigned tasks.
 - **Ask the meeting:** Get concise answers grounded in the saved meeting notes and transcript.
 - **Keep work moving:** Track pending, completed, overdue, and upcoming action items.
 - **Export the meeting in a PDF in seconds:** Convert the speaker notes, transcript and tasks to do in a PDF instantly using built-in feature.
