@@ -56,6 +56,7 @@
 - Node.js and npm
 - Expo Go on a physical Android or iOS device, or a supported emulator
 - A Google Gemini API key for AI Q&A and audio processing
+- To run the application, both the laptop and mobile should be on same internet network.
 
 ### Install
 
@@ -83,17 +84,18 @@ Add your Gemini key to `.env`:
 EXPO_PUBLIC_GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Start the app:
+Open the terminal:
 
 ```bash
-npx expo start
+npx expo start --web -c
 ```
-
-Scan the QR code with Expo Go, or press `a` or `i` in the Expo terminal to launch an Android or iOS emulator. Press `w` to open the web version. If the phone cannot reach the development server over the local network, try:
+This is to run the demo on web. To run the app on mobile Download "Expo Go" mobile application from PlayStore, after setting up your account type on the terminal: 
 
 ```bash
-npx expo start --tunnel
+npx expo start -c
 ```
+
+Scan the QR code as shown on terminal with Expo Go. The app will run after setting up Metro.
 
 After changing `.env`, restart the Expo development server so the updated variable is loaded.
 
