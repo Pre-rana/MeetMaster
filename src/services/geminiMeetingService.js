@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import { createId } from '../utils/format';
 
-const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite', '	gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
 
 const MEETING_PROMPT = `You are MeetMaster, a meeting-intelligence engine.
 Listen to the meeting audio and return STRICT JSON only (no markdown) with this shape:
